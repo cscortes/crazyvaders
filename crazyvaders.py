@@ -1,5 +1,7 @@
 #!/bin/python3
 
+## Need to add the GPL3 to every file
+
 import pygame
 from invaderutils import *
 from mylogging import log
