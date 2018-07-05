@@ -58,3 +58,8 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 
+# Remove the personal games files
+*.cnf
+*.log
+
+
