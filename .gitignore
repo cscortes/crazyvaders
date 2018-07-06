@@ -61,5 +61,5 @@ __pycache__/
 # Remove the personal games files
 *.cnf
 *.log
-
+*.Pipfile.swp
 
