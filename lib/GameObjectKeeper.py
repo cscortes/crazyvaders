@@ -1,11 +1,5 @@
-
-from mylogging import log 
-import configparser
-
-
-class GameBase(object):
-    def __init__(self):
-        pass
+from lib.GameBase import GameBase
+from lib.mylogging import log
 
 class ObjectMeta(object):
     def __init__(self, ob : GameBase, level : int, friend : bool, enemy : bool) -> None:
@@ -65,25 +59,4 @@ class GameObjectKeeper(object):
                 cls.OBJECT_LIST.remove(item)
                 log.debug("Removing {}".format(item))
                 return
-        raise ValueError("Item {0} not found in list.".format(ob))            
-
-class HighscoreStore(object):
-    
-    def __init__(self, filename = "invaders.cnf"):
-        self.cnf = configparser.ConfigParser()
-        self.cnf.read(filename)
-        self.filename = filename
-
-    def get_highscore(self):
-        return  int(self.cnf["DEFAULT"].get("highscore","-1"))
-        
-    def set_highscore(self, score):
-        log.debug("SCORE {}".format(score))
-        if score > self.get_highscore():
-            log.debug("HIGH SCORE BEATEN {} => {}".format(self.get_highscore(), score))
-            self.cnf.set("DEFAULT","highscore",str(score))
-
-    def update(self):
-        with open(self.filename,"w") as f:
-            self.cnf.write(f)
-
+        raise ValueError("Item {0} not found in list.".format(ob))

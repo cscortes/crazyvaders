@@ -3,9 +3,19 @@
 ## Need to add the GPL3 to every file
 
 import pygame
-from invaderutils import *
-from mylogging import log
-from gamestore import HighscoreStore
+
+from lib import invaderutils
+from lib.AutoMovingAnimatedSprite import AutoMovingAnimatedSprite
+from lib.Banner import Banner
+from lib.Enemy import Enemy
+from lib.GameBase import *
+from lib.GameMachine import GameMachine
+from lib.GameObjectKeeper import GameObjectKeeper
+from lib.Hero import Hero
+from lib.HighscoreStore import HighscoreStore
+from lib.LineOfNumbers import LineOfNumbers
+from lib.mylogging import log
+from lib.Score import Score
 
 effect = None
 highscorestore = HighscoreStore()
@@ -24,7 +34,7 @@ def collide_action(friend, enemy):
 
     explosion = AutoMovingAnimatedSprite(
         enemy.x, enemy.y, 
-        explosion_png(), 
+        invaderutils.explosion_png(), 
         movex=0, movey=-1, msteps=1)
     GameObjectKeeper.setup(explosion, 35)
     myscoreboard.addscore(5)
@@ -41,24 +51,24 @@ def main():
 
     setupscore()
 
-    GameObjectKeeper.setupfriendly(Hero(100,710,hero_png(),steps=5, move_steps=2), 50)
+    GameObjectKeeper.setupfriendly(Hero(100, 710, invaderutils.hero_png(), steps=5, move_steps=2), 50)
 
     badguys()
 
     game.run(collide_action)
 
 def setupscore():
-    banner = Banner("SCORE", Game.get_font_normal(), pos=(0, 10))
+    banner = Banner("SCORE", GameBase.get_font_normal(), color=invaderutils.COLOR_WHITE, pos=(0, 10))
     GameObjectKeeper.setup(banner, 1000)
 
     global myscoreboard
-    myscoreboard = Score( 0, 35, Game.get_font_normal(), COLOR_YELLOW)
+    myscoreboard = Score( 0, 35, GameBase.get_font_normal(), invaderutils.COLOR_YELLOW)
     GameObjectKeeper.setup(myscoreboard, 1000)
 
-    banner = Banner("HIGH SCORE", Game.get_font_normal(), pos=(300, 10))
+    banner = Banner("HIGH SCORE", GameBase.get_font_normal(), color=invaderutils.COLOR_WHITE, pos=(300, 10))
     GameObjectKeeper.setup(banner, 1000)
 
-    banner = Banner("{0:010}".format(highscorestore.get_highscore()), Game.get_font_normal(), pos=(300, 35), color=COLOR_YELLOW)
+    banner = Banner("{0:010}".format(highscorestore.get_highscore()), GameBase.get_font_normal(),  pos=(300, 35), color=invaderutils.COLOR_YELLOW)
     GameObjectKeeper.setup(banner, 1000)
 
     highscorestore.get_highscore()
@@ -66,22 +76,19 @@ def setupscore():
 
 def badguys():
     for x in range( 0, 800, 100):
-        enemy = Enemy(x, 25, invader_png(4), bombclockpts=(100,250), lowermove=30, movex=-3)
+        enemy = Enemy(x, 25, invaderutils.invader_png(4), bombclockpts=(100,250), lowermove=30, movex=-3)
         GameObjectKeeper.setupenemy(enemy, 50)
 
-        enemy = Enemy(x-55, 100, invader_png(2), bombclockpts=(1500,3000), lowermove=40)
+        enemy = Enemy(x-55, 100, invaderutils.invader_png(2), bombclockpts=(1500,3000), lowermove=40)
         GameObjectKeeper.setupenemy(enemy, 50)
 
-        enemy = Enemy(x, 175, invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
+        enemy = Enemy(x, 175, invaderutils.invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
         GameObjectKeeper.setupenemy(enemy, 50)
 
-        enemy = Enemy(x+25, 250, invader_png(3), bombclockpts=(1000,4000), lowermove=80)
+        enemy = Enemy(x+25, 250, invaderutils.invader_png(3), bombclockpts=(1000,4000), lowermove=80)
         GameObjectKeeper.setupenemy(enemy, 50)
 
 
 main()
 highscorestore.update()
 log.info("Game Done!")
-
-
-
