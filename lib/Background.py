@@ -1,6 +1,9 @@
 import pygame
-from lib.GameObject import GameObject
+
 from lib import invaderutils
+from lib.GameObject import GameObject
+from lib.MyExceptions import QuitProgram
+
 
 class Background(GameObject):
     """@todo: Rethink _SCREEN, maybe should be instance variable -- this is really a singleton object"""

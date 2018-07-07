@@ -13,10 +13,38 @@ COLOR_YELLOW = (255,255,51)
 
 # Custom event identifers
 #
-GAME_STARTED_EVENT = pygame.USEREVENT + 1
-HERO_KILLED_EVENT  = pygame.USEREVENT + 2
-MODE_FIGHT_EVENT   = pygame.USEREVENT + 3
-GAME_END_EVENT     = pygame.USEREVENT + 4
+# 
+GAME_STARTED_EVENT       = pygame.USEREVENT + 1
+HERO_KILLED_EVENT        = pygame.USEREVENT + 3
+GAME_END_EVENT           = pygame.USEREVENT + 5
+GAME_ENEMIES_DEAD_EVENT  = pygame.USEREVENT + 6
+
+GAME_WAVE_1_EVENT        = pygame.USEREVENT + 10
+GAME_LOADING_1_EVENT     = pygame.USEREVENT + 12
+
+GAME_WAVE_2_EVENT        = pygame.USEREVENT + 14
+GAME_LOADING_2_EVENT     = pygame.USEREVENT + 16
+
+GAME_WAVE_3_EVENT        = pygame.USEREVENT + 18
+GAME_LOADING_3_EVENT     = pygame.USEREVENT + 20
+
+GAME_WAVE_4_EVENT        = pygame.USEREVENT + 22
+GAME_LOADING_4_EVENT     = pygame.USEREVENT + 24
+
+GAME_WAVE_5_EVENT        = pygame.USEREVENT + 26
+GAME_LOADING_5_EVENT     = pygame.USEREVENT + 28
+
+GAME_WINNER_EVENT        = pygame.USEREVENT + 30
+
+
+MODE_FIGHT_A_EVENT       = pygame.USEREVENT + 90
+MODE_FIGHT_1_EVENT       = pygame.USEREVENT + 91
+MODE_FIGHT_2_EVENT       = pygame.USEREVENT + 92
+MODE_FIGHT_3_EVENT       = pygame.USEREVENT + 93
+MODE_FIGHT_4_EVENT       = pygame.USEREVENT + 94
+MODE_FIGHT_5_EVENT       = pygame.USEREVENT + 95
+MODE_FIGHT_Z_EVENT       = pygame.USEREVENT + 96
+
 
 # These values are used all over the place
 # can't make up my mind how to handle them

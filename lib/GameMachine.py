@@ -33,35 +33,57 @@ class Thump(object):
 
 class GameMachine(object):
     clock = None
-    game_mode = None
+    _game_mode = None
     transitions : Transitions = None
     highscorestore : HighscoreStore = None 
 
     def __init__(self, width, height):
         invaderutils.set_game_dimensions(width, height)
         GameMachine.clock =  pygame.time.Clock()
-        GameMachine.game_mode = invaderutils.GAME_STARTED_EVENT
         GameMachine.transitions = Transitions()
         GameMachine.highscorestore = HighscoreStore()
         GameObjectKeeper.special_setup(Background(), 0)
+
+    def set_game_mode(self, new_mode):
+        log.debug("Game mode changed to {}".format(new_mode))
+        self._game_mode = new_mode
+
+    def get_game_mode(self):
+        return self._game_mode
 
     def teardown(self):
         GameMachine.highscorestore.update()
 
     def setup(self):
-        self.transitions.add(invaderutils.GAME_STARTED_EVENT, invaderutils.MODE_FIGHT_EVENT, 10, self.wave_0)
+        self.transitions.add(invaderutils.GAME_STARTED_EVENT, invaderutils.GAME_LOADING_1_EVENT, 0, self.wave_loading_1)
+        self.transitions.add(invaderutils.GAME_LOADING_1_EVENT, invaderutils.GAME_WAVE_1_EVENT, 2, self.wave_1)
+        self.transitions.add(invaderutils.GAME_WAVE_1_EVENT, invaderutils.MODE_FIGHT_1_EVENT, 0, self.wave_fight)
 
+        self.transitions.add(invaderutils.MODE_FIGHT_1_EVENT, invaderutils.GAME_ENEMIES_DEAD_EVENT, 2, self.wave_loading_2)
+        self.transitions.add(invaderutils.GAME_ENEMIES_DEAD_EVENT, invaderutils.GAME_WAVE_2_EVENT, 2, self.wave_2)
+        self.transitions.add(invaderutils.GAME_WAVE_2_EVENT, invaderutils.MODE_FIGHT_2_EVENT, 0, self.wave_fight)
+
+        self.transitions.add(invaderutils.MODE_FIGHT_2_EVENT, invaderutils.GAME_ENEMIES_DEAD_EVENT, 2, self.wave_loading_3)
+        self.transitions.add(invaderutils.GAME_ENEMIES_DEAD_EVENT, invaderutils.GAME_WAVE_3_EVENT, 2, self.wave_3)
+        self.transitions.add(invaderutils.GAME_WAVE_3_EVENT, invaderutils.MODE_FIGHT_3_EVENT, 0, self.wave_fight)
+
+        self.transitions.add(invaderutils.MODE_FIGHT_3_EVENT, invaderutils.GAME_ENEMIES_DEAD_EVENT, 2, self.wave_loading_4)
+        self.transitions.add(invaderutils.GAME_ENEMIES_DEAD_EVENT, invaderutils.GAME_WAVE_4_EVENT, 2, self.wave_4)
+        self.transitions.add(invaderutils.GAME_WAVE_4_EVENT, invaderutils.MODE_FIGHT_4_EVENT, 0, self.wave_fight)
+
+        self.transitions.add(invaderutils.MODE_FIGHT_4_EVENT, invaderutils.GAME_ENEMIES_DEAD_EVENT, 2, self.wave_loading_5)
+        self.transitions.add(invaderutils.GAME_ENEMIES_DEAD_EVENT, invaderutils.GAME_WAVE_5_EVENT, 2, self.wave_5)
+        self.transitions.add(invaderutils.GAME_WAVE_5_EVENT, invaderutils.MODE_FIGHT_5_EVENT, 0, self.wave_fight)
+
+        self.transitions.add(invaderutils.MODE_FIGHT_5_EVENT, invaderutils.GAME_ENEMIES_DEAD_EVENT, 2, self.wave_winner)
+        self.transitions.add(invaderutils.GAME_ENEMIES_DEAD_EVENT, invaderutils.GAME_END_EVENT, 10, self.wave_quit)
 
     def run(self):
-        
-        GameMachine.game_mode = invaderutils.MODE_FIGHT_EVENT
+        self.set_game_mode(invaderutils.GAME_LOADING_1_EVENT)
 
         try:
-            while GameMachine.game_mode in [
-                invaderutils.MODE_FIGHT_EVENT, invaderutils.HERO_KILLED_EVENT]:
-
-                self.senario_change(GameMachine.game_mode)
-
+            while True:
+                self.senario_change()
                 self.remove_terminated()
 
                 events = pygame.event.get()
@@ -94,11 +116,24 @@ class GameMachine(object):
                 break
 
     def collision_detection(self):
-        for enemy in GameObjectKeeper.enemies():
+        curr_state = self.get_game_mode()
+
+        # Check to see if we are in FIGHT MODE
+        if not ((curr_state > invaderutils.MODE_FIGHT_A_EVENT) and (curr_state < invaderutils.MODE_FIGHT_Z_EVENT)):
+            return 
+
+        enemies = GameObjectKeeper.enemies()
+
+        if len(enemies) == 0:
+            self.set_game_mode(invaderutils.GAME_ENEMIES_DEAD_EVENT)
+            return
+        
+        for enemy in enemies:
             for friend in GameObjectKeeper.friendlies():
                 if enemy.collide(friend):
                     self.collide_action(friend, enemy)
                     self.check_friend_hero(friend)
+        
 
     def check_friend_hero(self, friend):
         if isinstance(friend, Hero):
@@ -108,15 +143,14 @@ class GameMachine(object):
     def process_events(self, evt):
         if evt.type == invaderutils.HERO_KILLED_EVENT:
             self.setup_loser_screen()
-            GameMachine.game_mode = invaderutils.HERO_KILLED_EVENT
+            self.set_game_mode (invaderutils.HERO_KILLED_EVENT)
 
         if evt.type == invaderutils.GAME_END_EVENT:
             log.info("Bye!")
-            GameMachine.game_mode = invaderutils.GAME_END_EVENT
+            self.set_game_mode(invaderutils.GAME_END_EVENT)
 
     def setup_loser_screen(self):
-        for go in GameObjectKeeper.runables():
-            GameObjectKeeper.remove(go)
+        self.clear_all_objects()
 
         bye = AnimatedSprite(300, 350, ["images/game/gameover.png"])
         GameObjectKeeper.setupenemy(bye, 1000)
@@ -143,14 +177,16 @@ class GameMachine(object):
         myscoreboard.addscore(5)
         self.highscorestore.set_highscore(myscoreboard.getscore())
 
+    def senario_change(self):
+        answer = self.transitions.get_wave(self.get_game_mode())
 
-    def senario_change(self, game_state):
-        wave_func = self.transitions.get_wave(game_state)
+        if ( answer is not None ):
+            (wave_func, param1) = answer
+            wave_func(param1)
 
-        if ( wave_func is not None ):
-            wave_func()
+    def _wave_basics(self):
+        self.clear_all_objects()
 
-    def wave_0(self):
         # Setup Banners for User
         
         banner = Banner("SCORE", GameBase.get_font_normal(), color=invaderutils.COLOR_WHITE, pos=(0, 10))
@@ -168,21 +204,152 @@ class GameMachine(object):
 
         GameMachine.highscorestore.get_highscore()
 
+        # setup hero
+        GameObjectKeeper.setupfriendly(Hero(100, 710, invaderutils.hero_png(), steps=5, move_steps=2), 50)
+
+    def wave_1(self, param):
+        log.info("Starting Wave 1")
+        self._wave_basics()
+
         # Setup bad guys
+        for x in range( 0, 400, 100):
+            # enemy = Enemy(x, 25, invaderutils.invader_png(4), bombclockpts=(100,250), lowermove=30, movex=-3)
+            # GameObjectKeeper.setupenemy(enemy, 50)
 
-        for x in range( 0, 800, 100):
-            enemy = Enemy(x, 25, invaderutils.invader_png(4), bombclockpts=(100,250), lowermove=30, movex=-3)
-            GameObjectKeeper.setupenemy(enemy, 50)
+            # enemy = Enemy(x-55, 100, invaderutils.invader_png(2), bombclockpts=(1500,3000), lowermove=40)
+            # GameObjectKeeper.setupenemy(enemy, 50)
 
-            enemy = Enemy(x-55, 100, invaderutils.invader_png(2), bombclockpts=(1500,3000), lowermove=40)
-            GameObjectKeeper.setupenemy(enemy, 50)
-
-            enemy = Enemy(x, 175, invaderutils.invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
-            GameObjectKeeper.setupenemy(enemy, 50)
+            # enemy = Enemy(x, 175, invaderutils.invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
+            # GameObjectKeeper.setupenemy(enemy, 50)
 
             enemy = Enemy(x+25, 250, invaderutils.invader_png(3), bombclockpts=(1000,4000), lowermove=80)
             GameObjectKeeper.setupenemy(enemy, 50)
 
-        # setup hero
+        self.set_game_mode(invaderutils.MODE_FIGHT_1_EVENT)
 
-        GameObjectKeeper.setupfriendly(Hero(100, 710, invaderutils.hero_png(), steps=5, move_steps=2), 50)
+    def wave_2(self, param):
+        log.info("Starting Wave 2")
+        self._wave_basics()
+
+        # Setup bad guys
+        for x in range( 0, 400, 100):
+            # enemy = Enemy(x, 25, invaderutils.invader_png(4), bombclockpts=(100,250), lowermove=30, movex=-3)
+            # GameObjectKeeper.setupenemy(enemy, 50)
+
+            # enemy = Enemy(x-55, 100, invaderutils.invader_png(2), bombclockpts=(1500,3000), lowermove=40)
+            # GameObjectKeeper.setupenemy(enemy, 50)
+
+            enemy = Enemy(x, 175, invaderutils.invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
+            GameObjectKeeper.setupenemy(enemy, 50)
+
+            # enemy = Enemy(x+25, 250, invaderutils.invader_png(3), bombclockpts=(1000,4000), lowermove=80)
+            # GameObjectKeeper.setupenemy(enemy, 50)
+
+        self.set_game_mode(invaderutils.MODE_FIGHT_2_EVENT)
+
+    def wave_3(self, param):
+        log.info("Starting Wave 3")
+        self._wave_basics()
+
+        # Setup bad guys
+        for x in range( 0, 400, 100):
+            # enemy = Enemy(x, 25, invaderutils.invader_png(4), bombclockpts=(100,250), lowermove=30, movex=-3)
+            # GameObjectKeeper.setupenemy(enemy, 50)
+
+            # enemy = Enemy(x-55, 100, invaderutils.invader_png(2), bombclockpts=(1500,3000), lowermove=40)
+            # GameObjectKeeper.setupenemy(enemy, 50)
+
+            # enemy = Enemy(x, 175, invaderutils.invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
+            # GameObjectKeeper.setupenemy(enemy, 50)
+
+            enemy = Enemy(x+25, 250, invaderutils.invader_png(3), bombclockpts=(1000,4000), lowermove=80)
+            GameObjectKeeper.setupenemy(enemy, 50)
+
+        self.set_game_mode(invaderutils.MODE_FIGHT_3_EVENT)
+
+    def wave_4(self, param):
+        log.info("Starting Wave 4")
+        self._wave_basics()
+
+        # Setup bad guys
+        for x in range( 0, 400, 100):
+            # enemy = Enemy(x, 25, invaderutils.invader_png(4), bombclockpts=(100,250), lowermove=30, movex=-3)
+            # GameObjectKeeper.setupenemy(enemy, 50)
+
+            # enemy = Enemy(x-55, 100, invaderutils.invader_png(2), bombclockpts=(1500,3000), lowermove=40)
+            # GameObjectKeeper.setupenemy(enemy, 50)
+
+            enemy = Enemy(x, 175, invaderutils.invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
+            GameObjectKeeper.setupenemy(enemy, 50)
+
+            # enemy = Enemy(x+25, 250, invaderutils.invader_png(3), bombclockpts=(1000,4000), lowermove=80)
+            # GameObjectKeeper.setupenemy(enemy, 50)
+
+        self.set_game_mode(invaderutils.MODE_FIGHT_4_EVENT)
+
+    def wave_5(self, param):
+        log.info("Starting Wave 5")
+        self._wave_basics()
+
+        # Setup bad guys
+        for x in range( 0, 400, 100):
+            enemy = Enemy(x, 25, invaderutils.invader_png(4), bombclockpts=(100,250), lowermove=30, movex=-3)
+            GameObjectKeeper.setupenemy(enemy, 50)
+
+            # enemy = Enemy(x-55, 100, invaderutils.invader_png(2), bombclockpts=(1500,3000), lowermove=40)
+            # GameObjectKeeper.setupenemy(enemy, 50)
+
+            # enemy = Enemy(x, 175, invaderutils.invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
+            # GameObjectKeeper.setupenemy(enemy, 50)
+
+            # enemy = Enemy(x+25, 250, invaderutils.invader_png(3), bombclockpts=(1000,4000), lowermove=80)
+            # GameObjectKeeper.setupenemy(enemy, 50)
+
+        self.set_game_mode(invaderutils.MODE_FIGHT_5_EVENT)
+
+    def wave_loading(self, param1):
+        log.info("Starting Wave {} Loading ...".format(param1))
+        self.clear_all_objects()
+
+        banner = Banner("Wave {} Loading ...".format(param1), GameBase.get_font_normal(), 
+        color=invaderutils.COLOR_WHITE, pos=(250,325))
+        GameObjectKeeper.setup(banner, 1000)
+
+    def wave_loading_1(self, param1):
+        self.wave_loading(1)
+        self.set_game_mode (invaderutils.GAME_WAVE_1_EVENT)
+        
+    def wave_loading_2(self, param1):
+        self.wave_loading(2)
+        self.set_game_mode (invaderutils.GAME_WAVE_2_EVENT)
+
+    def wave_loading_3(self, param1):
+        self.wave_loading(3)
+        self.set_game_mode(invaderutils.GAME_WAVE_3_EVENT)
+
+    def wave_loading_4(self, param1):
+        self.wave_loading(4)
+        self.set_game_mode(invaderutils.GAME_WAVE_4_EVENT)
+
+    def wave_loading_5(self, param1):
+        self.wave_loading(5)
+        self.set_game_mode(invaderutils.GAME_WAVE_5_EVENT)
+
+    def wave_fight(self, param1):
+        log.info("Fight !")
+
+    def wave_winner(self, parm1):
+        log.info("WINNER")
+        self.clear_all_objects()
+
+        banner = Banner("Winner!", GameBase.get_font_normal(), 
+        color=invaderutils.COLOR_WHITE, pos=(250,325))
+        GameObjectKeeper.setup(banner, 1000)
+        self.set_game_mode(invaderutils.GAME_END_EVENT)
+
+    def wave_quit(self, param1):
+        raise QuitProgram()
+
+    def clear_all_objects(self):
+        for go in GameObjectKeeper.runables():
+            GameObjectKeeper.remove(go)
