@@ -222,7 +222,7 @@ class GameMachine(object):
             # enemy = Enemy(x, 175, invaderutils.invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
             # GameObjectKeeper.setupenemy(enemy, 50)
 
-            enemy = Enemy(x+25, 250, invaderutils.invader_png(3), bombclockpts=(1000,4000), lowermove=80)
+            enemy = Enemy(x+25, 50, invaderutils.invader_png(3), bombclockpts=(500,1000), lowermove=80)
             GameObjectKeeper.setupenemy(enemy, 50)
 
         self.set_game_mode(invaderutils.MODE_FIGHT_1_EVENT)
@@ -239,7 +239,7 @@ class GameMachine(object):
             # enemy = Enemy(x-55, 100, invaderutils.invader_png(2), bombclockpts=(1500,3000), lowermove=40)
             # GameObjectKeeper.setupenemy(enemy, 50)
 
-            enemy = Enemy(x, 175, invaderutils.invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
+            enemy = Enemy(x, 50, invaderutils.invader_png(1), bombclockpts=(500,1000), lowermove=60,movex=-2)
             GameObjectKeeper.setupenemy(enemy, 50)
 
             # enemy = Enemy(x+25, 250, invaderutils.invader_png(3), bombclockpts=(1000,4000), lowermove=80)
@@ -262,7 +262,7 @@ class GameMachine(object):
             # enemy = Enemy(x, 175, invaderutils.invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
             # GameObjectKeeper.setupenemy(enemy, 50)
 
-            enemy = Enemy(x+25, 250, invaderutils.invader_png(3), bombclockpts=(1000,4000), lowermove=80)
+            enemy = Enemy(x+25, 50, invaderutils.invader_png(3), bombclockpts=(250,1000), lowermove=80)
             GameObjectKeeper.setupenemy(enemy, 50)
 
         self.set_game_mode(invaderutils.MODE_FIGHT_3_EVENT)
@@ -279,7 +279,7 @@ class GameMachine(object):
             # enemy = Enemy(x-55, 100, invaderutils.invader_png(2), bombclockpts=(1500,3000), lowermove=40)
             # GameObjectKeeper.setupenemy(enemy, 50)
 
-            enemy = Enemy(x, 175, invaderutils.invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
+            enemy = Enemy(x, 50, invaderutils.invader_png(1), bombclockpts=(250,1250), lowermove=60,movex=-2)
             GameObjectKeeper.setupenemy(enemy, 50)
 
             # enemy = Enemy(x+25, 250, invaderutils.invader_png(3), bombclockpts=(1000,4000), lowermove=80)
