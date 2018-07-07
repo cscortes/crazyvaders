@@ -13,9 +13,10 @@ COLOR_YELLOW = (255,255,51)
 
 # Custom event identifers
 #
-HERO_KILLED_EVENT = pygame.USEREVENT + 1
-MODE_FIGHT_EVENT  = pygame.USEREVENT + 2
-GAME_END_EVENT    = pygame.USEREVENT + 3
+GAME_STARTED_EVENT = pygame.USEREVENT + 1
+HERO_KILLED_EVENT  = pygame.USEREVENT + 2
+MODE_FIGHT_EVENT   = pygame.USEREVENT + 3
+GAME_END_EVENT     = pygame.USEREVENT + 4
 
 # These values are used all over the place
 # can't make up my mind how to handle them

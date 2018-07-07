@@ -4,6 +4,7 @@ from lib.StaticObject import StaticObject
 class AnimatedSprite(StaticObject):
     def __init__(self, ix, iy, filenames, steps=10):
         super().__init__()
+        
         self.count = 0
         self.images = []
         for f in filenames:
