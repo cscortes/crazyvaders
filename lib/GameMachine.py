@@ -5,7 +5,7 @@ from lib.AnimatedSprite import AnimatedSprite
 from lib.AutoMovingAnimatedSprite import AutoMovingAnimatedSprite
 from lib.Background import Background
 from lib.Banner import Banner
-from lib.Enemy import Enemy
+from lib.Enemy import *
 from lib.GameBase import GameBase
 from lib.GameObjectKeeper import GameObjectKeeper
 from lib.Hero import Hero
@@ -34,14 +34,12 @@ class Thump(object):
 class GameMachine(object):
     clock = None
     _game_mode = None
-    transitions : Transitions = None
-    highscorestore : HighscoreStore = None 
+    transitions = Transitions()
+    highscorestore = HighscoreStore()
 
     def __init__(self, width, height):
         invaderutils.set_game_dimensions(width, height)
         GameMachine.clock =  pygame.time.Clock()
-        GameMachine.transitions = Transitions()
-        GameMachine.highscorestore = HighscoreStore()
         GameObjectKeeper.special_setup(Background(), 0)
 
     def set_game_mode(self, new_mode):
@@ -55,9 +53,15 @@ class GameMachine(object):
         GameMachine.highscorestore.update()
 
     def setup(self):
-        self.transitions.add(invaderutils.GAME_STARTED_EVENT, invaderutils.GAME_LOADING_1_EVENT, 0, self.wave_loading_1)
-        self.transitions.add(invaderutils.GAME_LOADING_1_EVENT, invaderutils.GAME_WAVE_1_EVENT, 2, self.wave_1)
+        self.transitions.add(invaderutils.GAME_STARTED_EVENT, invaderutils.GAME_STARTED_EVENT, 0, self.wave_loading_1)
+        self.transitions.add(invaderutils.GAME_STARTED_EVENT, invaderutils.GAME_WAVE_1_EVENT, 2, self.wave_1)
         self.transitions.add(invaderutils.GAME_WAVE_1_EVENT, invaderutils.MODE_FIGHT_1_EVENT, 0, self.wave_fight)
+
+
+        # self.transitions.add(invaderutils.GAME_STARTED_EVENT, invaderutils.GAME_STARTED_EVENT, 0, self.wave_loading_1)
+        # self.transitions.add(invaderutils.GAME_STARTED_EVENT, invaderutils.GAME_WAVE_1_EVENT, 2, self.wave_1)
+
+
 
         self.transitions.add(invaderutils.MODE_FIGHT_1_EVENT, invaderutils.GAME_ENEMIES_DEAD_EVENT, 2, self.wave_loading_2)
         self.transitions.add(invaderutils.GAME_ENEMIES_DEAD_EVENT, invaderutils.GAME_WAVE_2_EVENT, 2, self.wave_2)
@@ -79,7 +83,7 @@ class GameMachine(object):
         self.transitions.add(invaderutils.GAME_ENEMIES_DEAD_EVENT, invaderutils.GAME_END_EVENT, 10, self.wave_quit)
 
     def run(self):
-        self.set_game_mode(invaderutils.GAME_LOADING_1_EVENT)
+        self.set_game_mode(invaderutils.GAME_STARTED_EVENT)
 
         try:
             while True:
@@ -205,24 +209,25 @@ class GameMachine(object):
         GameMachine.highscorestore.get_highscore()
 
         # setup hero
-        GameObjectKeeper.setupfriendly(Hero(100, 710, invaderutils.hero_png(), steps=5, move_steps=2), 50)
+        GameObjectKeeper.setupfriendly(Hero(100, 710, invaderutils.hero_png(), mis_steps=100, steps=3, move_steps=2), 50)
 
     def wave_1(self, param):
         log.info("Starting Wave 1")
         self._wave_basics()
 
         # Setup bad guys
-        for x in range( 0, 400, 100):
-            # enemy = Enemy(x, 25, invaderutils.invader_png(4), bombclockpts=(100,250), lowermove=30, movex=-3)
-            # GameObjectKeeper.setupenemy(enemy, 50)
+        for x in range( 0, 400, 150):
 
-            # enemy = Enemy(x-55, 100, invaderutils.invader_png(2), bombclockpts=(1500,3000), lowermove=40)
-            # GameObjectKeeper.setupenemy(enemy, 50)
+            enemy = enemy_little_john(x, 50)
+            GameObjectKeeper.setupenemy(enemy, 50)
 
-            # enemy = Enemy(x, 175, invaderutils.invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
-            # GameObjectKeeper.setupenemy(enemy, 50)
+            enemy = enemy_little_john(x+125, 150)
+            GameObjectKeeper.setupenemy(enemy, 50)
 
-            enemy = Enemy(x+25, 50, invaderutils.invader_png(3), bombclockpts=(500,1000), lowermove=80)
+            enemy = enemy_little_john(x, 250)
+            GameObjectKeeper.setupenemy(enemy, 50)
+
+            enemy = enemy_little_john(x+125, 350)
             GameObjectKeeper.setupenemy(enemy, 50)
 
         self.set_game_mode(invaderutils.MODE_FIGHT_1_EVENT)
@@ -232,18 +237,12 @@ class GameMachine(object):
         self._wave_basics()
 
         # Setup bad guys
-        for x in range( 0, 400, 100):
-            # enemy = Enemy(x, 25, invaderutils.invader_png(4), bombclockpts=(100,250), lowermove=30, movex=-3)
-            # GameObjectKeeper.setupenemy(enemy, 50)
-
-            # enemy = Enemy(x-55, 100, invaderutils.invader_png(2), bombclockpts=(1500,3000), lowermove=40)
-            # GameObjectKeeper.setupenemy(enemy, 50)
-
-            enemy = Enemy(x, 50, invaderutils.invader_png(1), bombclockpts=(500,1000), lowermove=60,movex=-2)
+        for x in range( 0, 750, 75):
+            enemy = enemy_fonzy(x, 70, movex=-2)
             GameObjectKeeper.setupenemy(enemy, 50)
 
-            # enemy = Enemy(x+25, 250, invaderutils.invader_png(3), bombclockpts=(1000,4000), lowermove=80)
-            # GameObjectKeeper.setupenemy(enemy, 50)
+            enemy = enemy_fonzy(x, 120, movex=-2)
+            GameObjectKeeper.setupenemy(enemy, 50)
 
         self.set_game_mode(invaderutils.MODE_FIGHT_2_EVENT)
 
@@ -253,17 +252,13 @@ class GameMachine(object):
 
         # Setup bad guys
         for x in range( 0, 400, 100):
-            # enemy = Enemy(x, 25, invaderutils.invader_png(4), bombclockpts=(100,250), lowermove=30, movex=-3)
-            # GameObjectKeeper.setupenemy(enemy, 50)
 
-            # enemy = Enemy(x-55, 100, invaderutils.invader_png(2), bombclockpts=(1500,3000), lowermove=40)
-            # GameObjectKeeper.setupenemy(enemy, 50)
-
-            # enemy = Enemy(x, 175, invaderutils.invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
-            # GameObjectKeeper.setupenemy(enemy, 50)
-
-            enemy = Enemy(x+25, 50, invaderutils.invader_png(3), bombclockpts=(250,1000), lowermove=80)
+            enemy = enemy_the_frig(x,70,movex=1)
             GameObjectKeeper.setupenemy(enemy, 50)
+
+            enemy = enemy_the_frig(x + 300, 140, movex=-1)
+            GameObjectKeeper.setupenemy(enemy, 50)
+
 
         self.set_game_mode(invaderutils.MODE_FIGHT_3_EVENT)
 
@@ -272,18 +267,9 @@ class GameMachine(object):
         self._wave_basics()
 
         # Setup bad guys
-        for x in range( 0, 400, 100):
-            # enemy = Enemy(x, 25, invaderutils.invader_png(4), bombclockpts=(100,250), lowermove=30, movex=-3)
-            # GameObjectKeeper.setupenemy(enemy, 50)
-
-            # enemy = Enemy(x-55, 100, invaderutils.invader_png(2), bombclockpts=(1500,3000), lowermove=40)
-            # GameObjectKeeper.setupenemy(enemy, 50)
-
-            enemy = Enemy(x, 50, invaderutils.invader_png(1), bombclockpts=(250,1250), lowermove=60,movex=-2)
+        for x in range( 0, 720, 75):
+            enemy = enemy_smiling_vader(x,70,movex=-3)
             GameObjectKeeper.setupenemy(enemy, 50)
-
-            # enemy = Enemy(x+25, 250, invaderutils.invader_png(3), bombclockpts=(1000,4000), lowermove=80)
-            # GameObjectKeeper.setupenemy(enemy, 50)
 
         self.set_game_mode(invaderutils.MODE_FIGHT_4_EVENT)
 
@@ -293,8 +279,42 @@ class GameMachine(object):
 
         # Setup bad guys
         for x in range( 0, 400, 100):
-            enemy = Enemy(x, 25, invaderutils.invader_png(4), bombclockpts=(100,250), lowermove=30, movex=-3)
+    
+            enemy = enemy_the_frig(x,70,movex=1)
             GameObjectKeeper.setupenemy(enemy, 50)
+
+            enemy = enemy_the_frig(x + 300, 140, movex=-1)
+            GameObjectKeeper.setupenemy(enemy, 50)
+
+        for x in range( 0, 720, 75):
+            enemy = enemy_smiling_vader(x,70,movex=-3)
+            GameObjectKeeper.setupenemy(enemy, 50)
+
+        for x in range( 0, 750, 75):
+            enemy = enemy_fonzy(x, 70, movex=-2)
+            GameObjectKeeper.setupenemy(enemy, 50)
+
+            enemy = enemy_fonzy(x, 120, movex=-2)
+            GameObjectKeeper.setupenemy(enemy, 50)
+
+
+        for x in range( 0, 400, 150):
+    
+            enemy = enemy_little_john(x, 50)
+            GameObjectKeeper.setupenemy(enemy, 50)
+
+            enemy = enemy_little_john(x+125, 150)
+            GameObjectKeeper.setupenemy(enemy, 50)
+
+            enemy = enemy_little_john(x, 250)
+            GameObjectKeeper.setupenemy(enemy, 50)
+
+            enemy = enemy_little_john(x+125, 350)
+            GameObjectKeeper.setupenemy(enemy, 50)
+
+
+            # enemy = Enemy(x, 25, invaderutils.invader_png(4), bombclockpts=(100,250), lowermove=30, movex=-3)
+            # GameObjectKeeper.setupenemy(enemy, 50)
 
             # enemy = Enemy(x-55, 100, invaderutils.invader_png(2), bombclockpts=(1500,3000), lowermove=40)
             # GameObjectKeeper.setupenemy(enemy, 50)
@@ -302,7 +322,7 @@ class GameMachine(object):
             # enemy = Enemy(x, 175, invaderutils.invader_png(1), bombclockpts=(1000,2000), lowermove=60,movex=-2)
             # GameObjectKeeper.setupenemy(enemy, 50)
 
-            # enemy = Enemy(x+25, 250, invaderutils.invader_png(3), bombclockpts=(1000,4000), lowermove=80)
+            # enemy = Enemy(x+25, 275, invaderutils.invader_png(3), bombclockpts=(1000,4000), lowermove=80)
             # GameObjectKeeper.setupenemy(enemy, 50)
 
         self.set_game_mode(invaderutils.MODE_FIGHT_5_EVENT)

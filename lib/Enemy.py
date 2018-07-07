@@ -46,3 +46,16 @@ class Enemy(AutoMovingAnimatedSprite):
     def draw(self, screen):
         self.clipx(self.cliplefthandler, self.cliprighthandler)
         super().draw(screen)
+
+
+def enemy_little_john(x, y):
+    return Enemy(x, y, invaderutils.invader_png(3), bombclockpts=(400,750), lowermove=100)
+
+def enemy_fonzy(x,y,movex):
+    return Enemy(x, y, invaderutils.invader_png(1), bombclockpts=(500,1000), lowermove=60,movex=movex)
+
+def enemy_the_frig(x,y,movex):
+    return Enemy(x, y, invaderutils.invader_png(2), bombclockpts=(200,750), lowermove=40, movex=movex)
+
+def enemy_smiling_vader(x,y,movex):
+    return Enemy(x, y, invaderutils.invader_png(4), bombclockpts=(75,250), lowermove=60, movex=movex)
