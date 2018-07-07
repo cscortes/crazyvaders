@@ -33,7 +33,7 @@ class Transitions(object):
     def _check(self, state, next_state, time_tics):
 
         for t in self.transitions:
-            if ( t.state == state ) and ( t.next_state == next_state ):
+            if (( t.state == state ) or (t.state is None)) and ( t.next_state == next_state ):
                 if (t.delay == 0):
                     self.current_state = next_state
                     log.info("TRANSITION: {} => {}".format(state, next_state))

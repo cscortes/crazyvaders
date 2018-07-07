@@ -57,11 +57,8 @@ class GameMachine(object):
         self.transitions.add(invaderutils.GAME_STARTED_EVENT, invaderutils.GAME_WAVE_1_EVENT, 2, self.wave_1)
         self.transitions.add(invaderutils.GAME_WAVE_1_EVENT, invaderutils.MODE_FIGHT_1_EVENT, 0, self.wave_fight)
 
-
         # self.transitions.add(invaderutils.GAME_STARTED_EVENT, invaderutils.GAME_STARTED_EVENT, 0, self.wave_loading_1)
         # self.transitions.add(invaderutils.GAME_STARTED_EVENT, invaderutils.GAME_WAVE_1_EVENT, 2, self.wave_1)
-
-
 
         self.transitions.add(invaderutils.MODE_FIGHT_1_EVENT, invaderutils.GAME_ENEMIES_DEAD_EVENT, 2, self.wave_loading_2)
         self.transitions.add(invaderutils.GAME_ENEMIES_DEAD_EVENT, invaderutils.GAME_WAVE_2_EVENT, 2, self.wave_2)
@@ -81,6 +78,10 @@ class GameMachine(object):
 
         self.transitions.add(invaderutils.MODE_FIGHT_5_EVENT, invaderutils.GAME_ENEMIES_DEAD_EVENT, 2, self.wave_winner)
         self.transitions.add(invaderutils.GAME_ENEMIES_DEAD_EVENT, invaderutils.GAME_END_EVENT, 10, self.wave_quit)
+
+        self.transitions.add(None, invaderutils.HERO_KILLED_EVENT, 4, self.setup_loser_screen)
+        self.transitions.add(invaderutils.HERO_KILLED_EVENT, invaderutils.GAME_END_EVENT, 4, self.wave_quit)
+
 
     def run(self):
         self.set_game_mode(invaderutils.GAME_STARTED_EVENT)
@@ -141,25 +142,16 @@ class GameMachine(object):
 
     def check_friend_hero(self, friend):
         if isinstance(friend, Hero):
-            ev = pygame.event.Event( invaderutils.HERO_KILLED_EVENT, {'message': "Hero is dead!"})
-            pygame.event.post(ev)
+            # example of firing off  an event
+            # ev = pygame.event.Event(invaderutils.HERO_KILLED_EVENT, {'message': "Hero is dead!"})
+            # pygame.event.post(ev)
+            self.set_game_mode(invaderutils.HERO_KILLED_EVENT)
 
     def process_events(self, evt):
-        if evt.type == invaderutils.HERO_KILLED_EVENT:
-            self.setup_loser_screen()
-            self.set_game_mode (invaderutils.HERO_KILLED_EVENT)
-
         if evt.type == invaderutils.GAME_END_EVENT:
             log.info("Bye!")
             self.set_game_mode(invaderutils.GAME_END_EVENT)
 
-    def setup_loser_screen(self):
-        self.clear_all_objects()
-
-        bye = AnimatedSprite(300, 350, ["images/game/gameover.png"])
-        GameObjectKeeper.setupenemy(bye, 1000)
-
-        pygame.time.set_timer(invaderutils.GAME_END_EVENT, 2500)
 
     def collide_action(self, friend, enemy):
         """ TODO: really don't like this routine here.  """
@@ -187,6 +179,14 @@ class GameMachine(object):
         if ( answer is not None ):
             (wave_func, param1) = answer
             wave_func(param1)
+
+    def setup_loser_screen(self, parm1):
+        self.clear_all_objects()
+
+        bye = AnimatedSprite(300, 350, ["images/game/gameover.png"])
+        GameObjectKeeper.setupenemy(bye, 1000)
+                
+        self.set_game_mode(invaderutils.GAME_END_EVENT)
 
     def _wave_basics(self):
         self.clear_all_objects()
