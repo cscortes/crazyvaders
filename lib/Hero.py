@@ -20,6 +20,8 @@ class Hero(AnimatedSprite):
         self.effect = pygame.mixer.Sound('sounds/thump.wav')
         self.effect.set_volume(0.03)
 
+        self.count = len(filenames)-1
+
 
     def process_events(self, evt):
         if (self.mis_steps >= Hero.MIS_STEPS):
@@ -65,3 +67,20 @@ class Hero(AnimatedSprite):
             invaderutils.missile_png(), movex=0, movey=-4, 
             msteps=1)
         GameObjectKeeper.setupfriendly(missile, 45)
+
+    def draw(self, screen):
+        image = self.images[self.count]
+        screen.blit(image, (self.x, self.y))
+
+        # self.steps += 1
+        # if (self.steps >= self.STEPS):
+        #     self.count = self.count + 1
+        #     self.count = self.count % len(self.images)
+        #     self.steps = 0
+
+    def terminate(self):
+
+        if self.count > 0:
+            self.count -= 1
+        else:
+            super().terminate()

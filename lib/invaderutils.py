@@ -36,7 +36,6 @@ GAME_LOADING_5_EVENT     = pygame.USEREVENT + 28
 
 GAME_WINNER_EVENT        = pygame.USEREVENT + 30
 
-
 MODE_FIGHT_A_EVENT       = pygame.USEREVENT + 90
 MODE_FIGHT_1_EVENT       = pygame.USEREVENT + 91
 MODE_FIGHT_2_EVENT       = pygame.USEREVENT + 92
@@ -84,7 +83,7 @@ def invader_png(n):
     return invader_dir(["enemy{}.png".format(n)])
 
 def hero_png():
-    return hero_dir(["hero.png"])
+    return hero_dir(["hero_01.png","hero_02.png","hero_03.png"])
 
 def missile_png():
     return hero_dir(["hero_missile.png"])

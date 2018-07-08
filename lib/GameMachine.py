@@ -145,7 +145,8 @@ class GameMachine(object):
             # example of firing off  an event
             # ev = pygame.event.Event(invaderutils.HERO_KILLED_EVENT, {'message': "Hero is dead!"})
             # pygame.event.post(ev)
-            self.set_game_mode(invaderutils.HERO_KILLED_EVENT)
+            if friend.removeme():
+                self.set_game_mode(invaderutils.HERO_KILLED_EVENT)
 
     def process_events(self, evt):
         if evt.type == invaderutils.GAME_END_EVENT:
@@ -155,7 +156,6 @@ class GameMachine(object):
 
     def collide_action(self, friend, enemy):
         """ TODO: really don't like this routine here.  """
-
         log.debug("COLLIDED: {0} {1}".format(type(friend),type(enemy)))
         Thump()
 
@@ -163,11 +163,10 @@ class GameMachine(object):
         enemy.terminate()
 
         explosion = AutoMovingAnimatedSprite(enemy.x, enemy.y,invaderutils.explosion_png(), movex=0, movey=-1, msteps=1)
-
         if (isinstance(friend, Hero)):
-            explosion = AutoMovingAnimatedSprite(enemy.x, enemy.y,invaderutils.hero_explosion_png(), movex=0, movey=-1, msteps=1)
+            explosion = AutoMovingAnimatedSprite(friend.x, friend.y, invaderutils.hero_explosion_png(), movex=0, movey=-1, msteps=1)
         elif (not isinstance(enemy, Enemy)):
-            explosion = AutoMovingAnimatedSprite(enemy.x, enemy.y,invaderutils.missile_explosion_png(), movex=0, movey=-1, msteps=1)
+            explosion = AutoMovingAnimatedSprite(enemy.x, enemy.y, invaderutils.missile_explosion_png(), movex=0, movey=-1, msteps=1)
 
         GameObjectKeeper.setup(explosion, 35)
         
