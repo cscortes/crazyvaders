@@ -169,9 +169,10 @@ class GameMachine(object):
         GameObjectKeeper.setup(explosion, 35)
         
         # add to score 
-        myscoreboard = GameObjectKeeper.get_by_name("myscoreboard")
-        myscoreboard.addscore(5)
-        self.highscorestore.set_highscore(myscoreboard.getscore())
+        if (not isinstance(friend, Hero)):
+            myscoreboard = GameObjectKeeper.get_by_name("myscoreboard")
+            myscoreboard.addscore(enemy.get_bonus())
+            self.highscorestore.set_highscore(myscoreboard.getscore())
 
     def senario_change(self):
         answer = self.transitions.get_wave(self.get_game_mode())
@@ -183,7 +184,7 @@ class GameMachine(object):
     def setup_loser_screen(self, parm1):
         self.clear_all_objects()
 
-        bye = AnimatedSprite(300, 350, ["images/game/gameover.png"])
+        bye = AnimatedSprite(200, 320, ["images/game/gameover.png"])
         GameObjectKeeper.setupenemy(bye, 1000)
                 
         self.set_game_mode(invaderutils.GAME_END_EVENT)
@@ -209,7 +210,7 @@ class GameMachine(object):
         GameMachine.highscorestore.get_highscore()
 
         # setup hero
-        GameObjectKeeper.setupfriendly(Hero(100, 710, invaderutils.hero_png(), mis_steps=100, steps=3, move_steps=2), 50)
+        GameObjectKeeper.setupfriendly(Hero(100, 710, invaderutils.hero_png(), mis_steps=75, steps=3, move_steps=2), 50)
 
     def wave_1(self, param):
         log.info("Starting Wave 1")
@@ -258,7 +259,6 @@ class GameMachine(object):
 
             enemy = enemy_the_frig(x + 300, 140, movex=-1)
             GameObjectKeeper.setupenemy(enemy, 50)
-
 
         self.set_game_mode(invaderutils.MODE_FIGHT_3_EVENT)
 

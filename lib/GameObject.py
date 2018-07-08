@@ -5,6 +5,7 @@ from lib.GameBase import GameBase
 class GameObject(GameBase):
     def __init__(self):
         self.request_removeme = False
+        self.bonus = 1
 
     def process_events(self, evt):
         raise NotImplementedError("Need to implement this")
@@ -64,3 +65,6 @@ class GameObject(GameBase):
 
     def get_height(self):
         return self.picsize[1]
+
+    def get_bonus(self):
+        return self.bonus
