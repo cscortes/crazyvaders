@@ -92,6 +92,12 @@ def missile_png():
 def explosion_png():
     return explosion_dir(["stardust_sm_%02d.png" % idx for idx in range(0,10)])
 
+def hero_explosion_png():
+    return explosion_dir(["stardust_hero_%02d.png" % idx for idx in range(0,10)])
+
+def missile_explosion_png():
+    return explosion_dir(["stardust_missile_%02d.png" % idx for idx in range(0,10)])
+
 def bomb_png():
     return add_dir("images/invader", ["ebomb.png"])
 

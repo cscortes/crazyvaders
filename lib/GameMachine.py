@@ -162,10 +162,13 @@ class GameMachine(object):
         friend.terminate()
         enemy.terminate()
 
-        explosion = AutoMovingAnimatedSprite(
-            enemy.x, enemy.y, 
-            invaderutils.explosion_png(), 
-            movex=0, movey=-1, msteps=1)
+        explosion = AutoMovingAnimatedSprite(enemy.x, enemy.y,invaderutils.explosion_png(), movex=0, movey=-1, msteps=1)
+
+        if (isinstance(friend, Hero)):
+            explosion = AutoMovingAnimatedSprite(enemy.x, enemy.y,invaderutils.hero_explosion_png(), movex=0, movey=-1, msteps=1)
+        elif (not isinstance(enemy, Enemy)):
+            explosion = AutoMovingAnimatedSprite(enemy.x, enemy.y,invaderutils.missile_explosion_png(), movex=0, movey=-1, msteps=1)
+
         GameObjectKeeper.setup(explosion, 35)
         
         # add to score 
