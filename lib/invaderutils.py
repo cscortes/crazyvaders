@@ -82,6 +82,18 @@ def explosion_dir(files):
 def invader_png(n):
     return invader_dir(["enemy{}.png".format(n)])
 
+
+def multi_invader_png(n,levels):
+	tmpl = "enemy{}_{}.png"
+	fnames = []
+	for idx in range(1,levels+1):
+		fnames.append(tmpl.format(n,idx))
+		fnames.append(tmpl.format(n,idx))
+		#fnames.append(tmpl.format(n,idx))
+
+	print(fnames)
+	return invader_dir(fnames)
+
 def hero_png():
     return hero_dir(["hero_01.png","hero_02.png","hero_03.png"])
 
