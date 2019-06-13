@@ -1,5 +1,7 @@
 import os
 import pygame 
+from lib.Star import Star
+
 
 # My color definitions, maybe pygame has them somewhere, these may 
 # disappear in the future.
@@ -112,4 +114,8 @@ def missile_explosion_png():
 def bomb_png():
     return add_dir("images/invader", ["ebomb.png"])
 
+def star_png():
+	return add_dir("images/misc", ["star1_1.png"])
 
+def star_field(numstars):
+	return [ Star() for i in range(numstars) ]
