@@ -53,7 +53,7 @@ def enemy_little_john(x, y):
 	return Enemy(x, y, invaderutils.multi_invader_png(3,5), bombclockpts=(400,750), lowermove=100, bonus=5)
 
 def enemy_fonzy(x,y,movex):
-    return Enemy(x, y, invaderutils.invader_png(1), bombclockpts=(500,1000), lowermove=60,movex=movex, bonus=20)
+    return Enemy(x, y, invaderutils.multi_invader_png(1,5), bombclockpts=(500,1000), lowermove=60,movex=movex, bonus=20)
 
 def enemy_the_frig(x,y,movex):
     return Enemy(x, y, invaderutils.invader_png(2), bombclockpts=(200,750), lowermove=40, movex=movex, bonus=10)
